@@ -33,11 +33,9 @@ i18next
 
     },
   });
-
 const app = express()
 app.use(express.json())
 app.use(cors())
-
 app.use(cookieParser())
 
 
@@ -49,11 +47,11 @@ io.on('connection', socket => {
     SocketServer(socket)
 })
 
- 
+// Create peer server
 ExpressPeerServer(http, { path: '/' })
- 
 
- 
+
+// Routes
 app.use('/api', require('./routes/languageRouter'))
 app.use('/api', require('./routes/authRouter'))
 app.use('/api', require('./routes/userRouter'))
@@ -62,7 +60,7 @@ app.use('/api', require('./routes/postadminRouter'))
 app.use('/api', require('./routes/commentRouter'))
 app.use('/api', require('./routes/notifyRouter'))
 app.use('/api', require('./routes/messageRouter'))
- 
+
 
 const URI = process.env.MONGODB_URL
 mongoose.connect(URI, {
@@ -75,8 +73,6 @@ mongoose.connect(URI, {
     console.log('Connected to mongodb')
 })
 
-
- 
 if(process.env.NODE_ENV === 'production'){
     app.use(express.static('client/build'))
     app.get('*', (req, res) => {

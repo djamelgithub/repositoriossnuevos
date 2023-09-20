@@ -4,7 +4,7 @@ const auth = require("../middleware/auth")
  
 router.get('/users', auth, userCtrl.getUsers)
 
-//router.get('/search', auth, userCtrl.searchUser)
+ router.get('/search', auth, userCtrl.searchUser)
 
 router.get('/user/:id', auth, userCtrl.getUser)
  
