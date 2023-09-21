@@ -319,7 +319,7 @@ const Home = () => {
                       type="button"
                       onClick={() => setShowSearchFields(!showSearchFields)}
                       style={{ textAlign: languagee.language === 'ar' ? 'right' : 'left' }}
-                      className="btn btn-coral  form-control mt-2"
+                      className="btn btn-primary form-control mb-2 mt-2"
                     >
                       {t('Rechercheavance', { lng: languagee.language })}{' '}
                       <i className={`fas fa-search ${showSearchFields ? 'active' : ''}`} style={{ marginRight: '5px' }}></i>
@@ -476,8 +476,8 @@ const Home = () => {
 
 
 
-                        <div className="search-container card-body   mb-2 mt-2" style={{  display: 'flex', justifyContent: 'space-between' }}>
-                          <button type="button" onClick={handleBuscar} className="btn btn-primary" >
+                        <div className="search-container card-body   mb-2 mt-2" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <button type="button" onClick={handleBuscar} className="btn btn-primary">
                             Filtre
 
                           </button>
@@ -495,14 +495,14 @@ const Home = () => {
 
 
                 </form>
-                <div className=' form-control '  >
+                <div className='card mb-2'  >
                 
-                  <Link to="/message" style={{ textAlign: languagee.language === 'ar' ? 'right' : 'left' }} className="btn btn-primary  ">
+                  <Link to="/message" style={{ textAlign: languagee.language === 'ar' ? 'right' : 'left' }} className="btn btn-primary mt-2">
                   Contacter l'administrateur
                   </Link>
                 </div>
 
-                <div className='card mt-2'>
+                <div className='card mt-4'>
                   {auth.user.role === 'admin' && <Status />}
 
                   {auth.user.role === 'admin' && (

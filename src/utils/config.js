@@ -1,3 +1,3 @@
-export const BASE_URL= "https://bckendnuevo.onrender.com"
+export const BASE_URL= "https://tassilidjamel-zqyg.onrender.com"
 
  

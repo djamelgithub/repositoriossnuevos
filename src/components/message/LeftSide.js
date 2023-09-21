@@ -20,155 +20,113 @@ const LeftSide = () => {
     const pageEnd = useRef()
     const [page, setPage] = useState(0)
 
-
-    const handleSearch = async (e) => {
-        e.preventDefault();
-
-
-
-        if (auth.user.role === 'admin') {
-            try {
-                const res = await getDataAPI(`search?username=${search}`, auth.token);
-                setSearchUsers(res.data.users);
-            } catch (err) {
-                dispatch({
-                    type: GLOBALTYPES.ALERT,
-                    payload: { error: err.response.data.msg },
-                });
-            }
-        }
-    };
-
-    useEffect(() => {
-        if (auth.user.role === 'admin') {
-          // Filtrar normalmente cuando el role es 'admin'
-          // ...
-        } else {
-          // Filtrar por el campo 'role' cuando el role es 'user'
-          try {
-            const fetchAdminUsers = async () => {
-              const res = await getDataAPI(`users`, auth.token);
-              const users = res.data.users;
-              const adminUsers = users.filter((user) => user.role === 'admin');
-              setSearchUsers(adminUsers);
-            };
     
-            fetchAdminUsers();
-          } catch (err) {
-            console.error(err);
-          }
+    const handleSearch = async e => {
+        e.preventDefault()
+        if(!search) return setSearchUsers([]);
+
+        try {
+            const res = await getDataAPI(`search?username=${search}`, auth.token)
+            setSearchUsers(res.data.users)
+        } catch (err) {
+            dispatch({
+                type: GLOBALTYPES.ALERT, payload: {error: err.response.data.msg}
+            })
         }
-    }, [auth.user.role, auth.token]);
-    
-
-
-
-
-
+    }
 
     const handleAddUser = (user) => {
         setSearch('')
         setSearchUsers([])
-        dispatch({ type: MESS_TYPES.ADD_USER, payload: { ...user, text: '', media: [] } })
-        dispatch({ type: MESS_TYPES.CHECK_ONLINE_OFFLINE, payload: online })
+        dispatch({type: MESS_TYPES.ADD_USER, payload: {...user, text: '', media: []}})
+        dispatch({type: MESS_TYPES.CHECK_ONLINE_OFFLINE, payload: online})
         return history.push(`/message/${user._id}`)
     }
 
     const isActive = (user) => {
-        if (id === user._id) return 'active';
+        if(id === user._id) return 'active';
         return ''
     }
 
     useEffect(() => {
-        if (message.firstLoad) return;
-        dispatch(getConversations({ auth }))
-    }, [dispatch, auth, message.firstLoad])
+        if(message.firstLoad) return;
+        dispatch(getConversations({auth}))
+    },[dispatch, auth, message.firstLoad])
 
     // Load More
     useEffect(() => {
         const observer = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) {
+            if(entries[0].isIntersecting){
                 setPage(p => p + 1)
             }
-        }, {
+        },{
             threshold: 0.1
         })
 
         observer.observe(pageEnd.current)
-    }, [setPage])
+    },[setPage])
 
     useEffect(() => {
-        if (message.resultUsers >= (page - 1) * 9 && page > 1) {
-            dispatch(getConversations({ auth, page }))
+        if(message.resultUsers >= (page - 1) * 9 && page > 1){
+            dispatch(getConversations({auth, page}))
         }
-    }, [message.resultUsers, page, auth, dispatch])
-
+    },[message.resultUsers, page, auth, dispatch])
+    
 
     // Check User Online - Offline
     useEffect(() => {
-        if (message.firstLoad) {
-            dispatch({ type: MESS_TYPES.CHECK_ONLINE_OFFLINE, payload: online })
+        if(message.firstLoad) {
+            dispatch({type: MESS_TYPES.CHECK_ONLINE_OFFLINE, payload: online})
         }
-    }, [online, message.firstLoad, dispatch])
+    },[online, message.firstLoad, dispatch])
 
     return (
         <>
-            {auth.user.role === 'admin' ? (
-                // Form con input de búsqueda para el admin
-                <form className="message_header" onSubmit={handleSearch}>
-                    <input
-                        type="text"
-                        value={search}
-                        placeholder="Administration Recherche..."
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                    <button type="submit" style={{ display: 'none' }}>Recherche</button>
-                </form>
-            ) : (
-                // Form con button de búsqueda para el user
-                <form className=" " onSubmit={handleSearch}>
-                    
-                   
-                </form>
-            )}
+            <form className="message_header" onSubmit={handleSearch} >
+                <input type="text" value={search}
+                placeholder="recherche.."
+                onChange={e => setSearch(e.target.value)} />
+
+                <button type="submit" style={{display: 'none'}}>Recher</button>
+            </form>
 
             <div className="message_chat_list">
                 {
                     searchUsers.length !== 0
-                        ? <>
-                            {
-                                searchUsers.map(user => (
-                                    <div key={user._id} className={`message_user ${isActive(user)}`}
-                                        onClick={() => handleAddUser(user)}>
-                                        <UserCard user={user} />
-                                    </div>
-                                ))
-                            }
-
-                        </>
-                        : <>
-                            {
-                                message.users.map(user => (
-                                    <div key={user._id} className={`message_user ${isActive(user)}`}
-                                        onClick={() => handleAddUser(user)}>
-                                        <UserCard user={user} msg={true}>
-                                            {
-                                                user.online
-                                                    ? <i className="fas fa-circle text-success" />
-                                                    : auth.user.following.find(item =>
-                                                        item._id === user._id
-                                                    ) && <i className="fas fa-circle" />
-
-                                            }
-
-                                        </UserCard>
-                                    </div>
-                                ))
-                            }
-                        </>
+                    ?  <>
+                        {
+                            searchUsers.map(user => (
+                                <div key={user._id} className={`message_user ${isActive(user)}`}
+                                onClick={() => handleAddUser(user)}>
+                                    <UserCard user={user} />
+                                </div>
+                            ))
+                        }
+                        
+                    </>
+                    : <>
+                        {
+                            message.users.map(user => (
+                                <div key={user._id} className={`message_user ${isActive(user)}`}
+                                onClick={() => handleAddUser(user)}>
+                                    <UserCard user={user} msg={true}>
+                                        {
+                                            user.online
+                                            ? <i className="fas fa-circle text-success" />
+                                            : auth.user.following.find(item => 
+                                                item._id === user._id
+                                            ) && <i className="fas fa-circle" />
+                                                
+                                        }
+                                        
+                                    </UserCard>
+                                </div>
+                            ))
+                        }
+                    </>
                 }
-
-                <button ref={pageEnd} style={{ opacity: 0 }} >Lire plus</button>
+               
+               <button ref={pageEnd} style={{opacity: 0}} >Lire plus</button>
             </div>
         </>
     )

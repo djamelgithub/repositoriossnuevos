@@ -22,9 +22,9 @@ const Status = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
       <button style={buttonStyles} onClick={handleButtonClick}>
-      Publier Post automobile
+      Publier un article Automobile
       </button>
     </div>
   );

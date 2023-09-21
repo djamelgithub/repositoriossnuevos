@@ -75,105 +75,30 @@ const RightSide = () => {
         setMedia(newArr)
     }
 
-    
-
-
-    const blockedKeywords = ['script', 'exe', 'bat', 'sh'];
-
-    const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-    const maxImages = 3;
-    
     const handleSubmit = async (e) => {
-        e.preventDefault();
-    
-        if (!text.trim() && media.length === 0) return;
-    
-        setText('');
-        setMedia([]);
-        setLoadMedia(true);
-    
-       /* if (media.length === 0) {
-            setLoadMedia(false);
-            return dispatch({
-                type: GLOBALTYPES.ALERT,
-                payload: { error: 'Veuillez ajouter votre photo.' },
-            });
-        }*/
-    
-        const invalidExtensions = media.filter(file =>
-            !allowedExtensions.includes(file.name.split('.').pop().toLowerCase())
-        );
-    
-        if (invalidExtensions.length > 0) {
-            setLoadMedia(false);
-            return dispatch({
-                type: GLOBALTYPES.ALERT,
-                payload: {
-                    error: `Les fichiers suivants ne sont pas autorisés: ${invalidExtensions.map(file => file.name).join(', ')}`,
-                },
-            });
-        }
-    
-        if (media.length > maxImages) {
-            setLoadMedia(false);
-            return dispatch({
-                type: GLOBALTYPES.ALERT,
-                payload: { error: `Vous ne pouvez télécharger que ${maxImages} images.` },
-            });
-        }
-    
-        const invalidFiles = media.filter(file =>
-            !allowedExtensions.includes(file.name.split('.').pop().toLowerCase()) ||
-            file.type.includes('video')
-        );
-    
-        if (invalidFiles.length > 0) {
-            setLoadMedia(false);
-            return dispatch({
-                type: GLOBALTYPES.ALERT,
-                payload: {
-                    error: `Les fichiers suivants ne sont pas autorisés: ${invalidFiles.map(file => file.name).join(', ')}`,
-                },
-            });
-        }
-    
-        const blockedFiles = media.filter(file =>
-            blockedKeywords.some(keyword =>
-                file.name.toLowerCase().includes(keyword)
-            )
-        );
-    
-        if (blockedFiles.length > 0) {
-            setLoadMedia(false);
-            return dispatch({
-                type: GLOBALTYPES.ALERT,
-                payload: {
-                    error: `Les fichiers suivants ne sont pas autorisés: ${blockedFiles.map(file => file.name).join(', ')}`,
-                },
-            });
-        }
-    
+        e.preventDefault()
+        if(!text.trim() && media.length === 0) return;
+        setText('')
+        setMedia([])
+        setLoadMedia(true)
+
         let newArr = [];
-        if (media.length > 0) {
-            newArr = await imageUpload(media);
-        }
-    
+        if(media.length > 0) newArr = await imageUpload(media)
+
         const msg = {
             sender: auth.user._id,
             recipient: id,
-            text,
+            text, 
             media: newArr,
-            createdAt: new Date().toISOString(),
-        };
-    
-        setLoadMedia(false);
-        await dispatch(addMessage({ msg, auth, socket }));
-    
-        if (refDisplay.current) {
-            refDisplay.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            createdAt: new Date().toISOString()
         }
-    };
-    
+
+        setLoadMedia(false)
+        await dispatch(addMessage({msg, auth, socket}))
+        if(refDisplay.current){
+            refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
+        }
+    }
 
     useEffect(() => {
         const getMessagesData = async () => {
@@ -212,7 +137,7 @@ const RightSide = () => {
     },[isLoadMore])
 
     const handleDeleteConversation = () => {
-        if(window.confirm('Voulez-vous supprimer ?')){
+        if(window.confirm('Do you want to delete?')){
             dispatch(deleteConversation({auth, id}))
             return history.push('/message')
         }
@@ -249,38 +174,36 @@ const RightSide = () => {
         callUser({video: false})
     }
     
-   
+    const handleVideoCall = () => {
+        caller({video: true})
+        callUser({video: true})
+    }
 
     return (
         <>
             <div className="message_header" style={{cursor: 'pointer'}} >
-            {user.length !== 0 &&
-    <UserCard user={user}>
-      <div>
-    
-        <>
-            <i className=" aqui vienen el icono del audio" onClick={handleAudioCall} style={{ marginRight: '16px' }} />
-        </>
-  
+                {
+                    user.length !== 0 &&
+                    <UserCard user={user}>
+                        <div>
+                            <i className="fas fa-phone-alt"
+                            onClick={handleAudioCall} />
 
-    <i className="fas fa-trash text-danger" onClick={handleDeleteConversation} />
-</div>
+                            <i className="fas fa-video mx-3"
+                            onClick={handleVideoCall} />
 
-    </UserCard>
-    }
-</div>
- 
+                            <i className="fas fa-trash text-danger"
+                            onClick={handleDeleteConversation} />
+                        </div>
+                    </UserCard>
+                }
+            </div>
 
-
-
-
-            
             <div className="chat_container" 
             style={{height: media.length > 0 ? 'calc(100% - 180px)' : ''}} >
                 <div className="chat_display" ref={refDisplay}>
                     <button style={{marginTop: '-25px', opacity: 0}} ref={pageEnd}>
-                        
-Charger plus
+                        Load more
                     </button>
 
                     {
@@ -330,30 +253,27 @@ Charger plus
             </div>
 
             <form className="chat_input" onSubmit={handleSubmit} >
-    <input type="text" className='btn btn-primary' placeholder="Votre message..."
-        value={text} onChange={e => setText(e.target.value)}
-        style={{
-            filter: theme ? 'invert(1)' : 'invert(0)',
-            background: theme ? '#040404' : '',
-            color: theme ? 'white' : ''
-        }} />
+                <input type="text" placeholder="Votre message..."
+                value={text} onChange={e => setText(e.target.value)}
+                style={{
+                    filter: theme ? 'invert(1)' : 'invert(0)',
+                    background: theme ? '#040404' : '',
+                    color: theme ? 'white' : ''
+                }} />
 
-    <Icons setContent={setText} content={text} theme={theme} />
+                <Icons setContent={setText} content={text} theme={theme} />
 
- 
-    <div className="file_upload">
-        <i className="fas fa-image text-danger" />
-        <input type="file" name="file" id="file"
-            multiple accept="image/*" onChange={handleChangeMedia} />
-    </div>
-   
+                <div className="file_upload">
+                    <i className="fas fa-image text-danger" />
+                    <input type="file" name="file" id="file"
+                    multiple accept="image/*,video/*" onChange={handleChangeMedia} />
+                </div>
 
-    <button type="submit" className="material-icons" 
-        disabled={(text || media.length > 0) ? false : true}>
-        near_me
-    </button>
-</form>
-
+                <button type="submit" className="material-icons" 
+                disabled={(text || media.length > 0) ? false : true}>
+                    near_me
+                </button>
+            </form>
         </>
     )
 }
